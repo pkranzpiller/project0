@@ -12,17 +12,28 @@ public class CustomerMenu {
 		System.out.println("Customer Menu");
 		
 		while(!checkUser(input)) {
-			System.out.println("Are you a new or returning user? (n, r): ");
+			System.out.println("Log in or create new account?(l, n) ");
 			input = s.nextLine();
 		}
 		
-		System.out.println(input);
+//		System.out.println(input);
+//		switch(input) {
+//		case l:
+//			break;
+//		case n:
+//			break;
+//		default:
+//			System.out.println("Error pulling up correct menu");
+//		}
 		
 		
+		
+		
+		s.close();
 	}
 	
 	private static boolean checkUser(String s) {
-		if(s.equals("n") || s.equals("r"))
+		if(s.equalsIgnoreCase("l") || s.equalsIgnoreCase("n"))
 			return true;
 		else
 			return false;
