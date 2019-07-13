@@ -2,9 +2,21 @@ package shared;
 
 public abstract class Account {
 	protected String username, password, firstName, lastName, email, dob;    //dob = date of birth
+	protected int id;
 	
 	protected Account(){
 		
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public int getId() {
+		if(id > 0) {
+			return this.id;
+		}else
+			return -1;
 	}
 
 	public String getUsername() {

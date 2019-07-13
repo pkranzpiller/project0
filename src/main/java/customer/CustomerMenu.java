@@ -16,19 +16,37 @@ public class CustomerMenu {
 			input = s.nextLine();
 		}
 		
-//		System.out.println(input);
-//		switch(input) {
-//		case l:
-//			break;
-//		case n:
-//			break;
-//		default:
-//			System.out.println("Error pulling up correct menu");
-//		}
+
+		//--------------------------logging in and creating new customer--------------------------------
+		int id;
+		boolean validUser = false;
+		Customer customer;
 		
-		
-		
-		
+		while(!validUser) {
+			switch(input) {
+			case "l":
+				String [] user = {};
+				while(user.length != 2) {
+					System.out.println("Please enter your username and password (<username> <password>):");
+					Scanner login = new Scanner(System.in);
+					user = login.nextLine().split(" ");
+				}
+				
+				CustomerDao customerData = new CustomerDao();
+				id = customerData.authenticateAndGetId(user[0], user[1]);
+				if(id > 0) {
+					validUser = true;
+					customer = customerData.getCustomer(id);
+					System.out.println(customer.getUsername() + " " + customer.getFirstName() + " " + customer.getLastName());
+				}
+				
+				break;
+			case "n":
+				break;
+			default:
+				System.out.println("Error pulling up correct menu");
+			}
+		}
 		s.close();
 	}
 	

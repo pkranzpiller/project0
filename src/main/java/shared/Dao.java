@@ -11,5 +11,7 @@ public interface Dao<E> {
 	void update();
 	
 	void delete();
+	
+//	int getId(String s);
 
 }
