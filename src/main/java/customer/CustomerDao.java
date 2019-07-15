@@ -9,12 +9,61 @@ import java.util.List;
 import shared.Dao;
 import util.ConnectionUtil;
 
-public class CustomerDao implements Dao {
+public class CustomerDao implements Dao<Customer> {
 
 	@Override
-	public void insert(Object e) {
-		// TODO Auto-generated method stub
-		
+	public void insert(Customer customer) {			//use checkIfAccountExists before calling this method and make sure to have
+		try {										//at least the username, password, fname, and lname for your parameter before the call
+			//----------------------------------insert basic account information into account------------------------------------
+			Connection con = ConnectionUtil.getInstance().getConnection();
+			ResultSet results;
+			int id;
+			
+			System.out.println("Values are as follows: " + customer.getUsername() + " " + customer.getPassword() + " " + customer.getFirstName() + " " + customer.getLastName());
+			
+			PreparedStatement ps = con.prepareStatement("insert into account(username, password, fname, lname) values(?, ?, ?, ?)");
+			
+			ps.setString(1, customer.getUsername());
+			ps.setString(2, customer.getPassword());
+			ps.setString(3, customer.getFirstName());
+			ps.setString(4, customer.getLastName());
+			ps.executeUpdate();
+			//----------------------------------get account ID to enable updating of customer table------------------------------
+			ps = con.prepareStatement("select id from account where username = ?");
+			ps.setString(1, customer.getUsername());
+			results = ps.executeQuery();
+			results.next();
+			id = results.getInt("id");
+			//-----------------------------------insert customer information into customer table-----------------------------------
+			ps = con.prepareStatement("insert into customer(id, balance) values(?, ?)");
+			ps.setInt(1, id);
+			ps.setDouble(2, 0);
+			ps.executeUpdate();
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("Error: Failed to create new user");
+			return;	
+		}
+	}
+	
+	@Override
+	public boolean checkIfAccountExists(String username) {
+		Connection con = ConnectionUtil.getInstance().getConnection();
+		ResultSet results;
+		try {
+			PreparedStatement ps = con.prepareStatement("Select * from account where username = ?");
+			ps.setString(1, username);
+			results = ps.executeQuery();
+			if(results.next())			//if the result exists, we know that the account exists
+				return false;
+			else
+				return true; 			//if the result doesn't exist, then we're good
+		} catch (SQLException e) {
+			System.out.println("Error: SQL exception. Failed to check if account exists");
+			e.printStackTrace();
+			return false;
+		}
 	}
 
 	@Override

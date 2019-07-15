@@ -6,6 +6,8 @@ public interface Dao<E> {
 	
 	void insert(E e);
 	
+	boolean checkIfAccountExists(String s);
+	
 	List<E> getAll();
 	
 	void update();

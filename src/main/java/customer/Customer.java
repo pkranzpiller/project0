@@ -5,9 +5,9 @@ import shared.Account;
 public class Customer extends Account {
 	private double balance;
 	
-	Customer(){}
+	public Customer(){}
 
-	Customer(int id, String username, String password, String fname, String lname, double balance) { //used for creating new customer
+	public Customer(int id, String username, String password, String fname, String lname, double balance) { //used for creating new customer
 		super();
 		this.username = username;
 		this.firstName = fname;
