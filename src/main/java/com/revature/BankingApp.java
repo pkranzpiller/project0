@@ -12,7 +12,7 @@ public class BankingApp {
     		System.exit(0);
     	}
     	MainInputHandler m = new MainInputHandler(args[0]);
-    	m.startMenu();
+    	m.startApplication();
     }
 
 }

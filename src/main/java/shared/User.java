@@ -1,12 +1,21 @@
 package shared;
 
-public abstract class Account {
+public abstract class User {
 	protected String username, password, firstName, lastName, email, dob;    //dob = date of birth
 	protected int id;
-	
-	protected Account(){
+	protected String permission;
+	protected User(){
 		
 	}
+	
+	public void setPermission(String permission) {
+		this.permission = permission;
+	}
+	
+	public String getPermission() {
+		return this.permission;
+	}
+	
 	
 	public void setId(int id) {
 		this.id = id;

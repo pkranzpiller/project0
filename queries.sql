@@ -1,7 +1,5 @@
-select * from account;
-select * from customer;
+select * from users;
+select * from accounts;
 
-select account.fname, account.lname, customer.balance from account join customer on customer.id=account.id;
-
-delete from customer where id=5;
-delete from account where id=8;
+select users.username, accounts.balance from users left join accounts on users.id=accounts.primaryUserId;--display customer username and balance
+select * from users left join accounts on users.id=accounts.primaryUserId;--display full user and account information

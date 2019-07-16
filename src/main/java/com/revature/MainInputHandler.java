@@ -1,39 +1,29 @@
 package com.revature;
 
-import customer.CustomerMenu;
+import customer.CustomerMainMenu;
 
 public class MainInputHandler {
 	private String input;
 
 	public MainInputHandler(String input) {
-		super();
 		this.input = input;
 	}
 
-	private boolean checkInput() {
+	public void startApplication() {
 		switch (input) {
 		case "customer":
-//			System.out.println("call customer");
-			return true;
+			System.out.println("Starting customer application");
+			CustomerMainMenu.start();
+			return;
 		case "employee":
-			System.out.println("Call employee");
-			return true;
+			System.out.println("Starting employee application");
+			return;
 		case "admin":
-			System.out.println("Call admin");
-			return true;
+			System.out.println("Starting administrator application");
+			return;
 		default:
-			System.out.println("Invalid input");
-			return false;
-		}
-	}
-	
-	public void startMenu() {
-		if(this.checkInput()) {
-//			System.out.println("Do stuff");
-			CustomerMenu.start();
-		}else {
-			System.out.println("Error: Incorrect parameters. Please pass one of the following parameters: customer, employee, admin.");
-			System.out.println("Example: BankingApp <parameter>");
+			System.out.println("Invalid input. Please pass customer, employee, or admin to start the correct application");
+			return;
 		}
 	}
 }

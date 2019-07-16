@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import shared.Dao;
@@ -17,42 +18,46 @@ public class CustomerDao implements Dao<Customer> {
 			//----------------------------------insert basic account information into account------------------------------------
 			Connection con = ConnectionUtil.getInstance().getConnection();
 			ResultSet results;
-			int id;
 			
 			System.out.println("Values are as follows: " + customer.getUsername() + " " + customer.getPassword() + " " + customer.getFirstName() + " " + customer.getLastName());
+
 			
-			PreparedStatement ps = con.prepareStatement("insert into account(username, password, fname, lname) values(?, ?, ?, ?)");
+			//--------------------------------------insert user into users table-----------------------------------------------------
+			PreparedStatement ps = con.prepareStatement("insert into users(userName, password, firstName, lastName, permission) values(?, ?, ?, ?, ?)");
 			
 			ps.setString(1, customer.getUsername());
 			ps.setString(2, customer.getPassword());
 			ps.setString(3, customer.getFirstName());
 			ps.setString(4, customer.getLastName());
+			ps.setString(5, "customer");
 			ps.executeUpdate();
-			//----------------------------------get account ID to enable updating of customer table------------------------------
-			ps = con.prepareStatement("select id from account where username = ?");
+			
+//			----------------------------------get account ID to enable updating of customer table------------------------------
+			ps = con.prepareStatement("select id from users where username = ?");
 			ps.setString(1, customer.getUsername());
 			results = ps.executeQuery();
 			results.next();
-			id = results.getInt("id");
-			//-----------------------------------insert customer information into customer table-----------------------------------
-			ps = con.prepareStatement("insert into customer(id, balance) values(?, ?)");
-			ps.setInt(1, id);
-			ps.setDouble(2, 0);
+			customer.setId(results.getInt("id"));
+			
+			//--------------------------------------insert user into customers table and set for pending-----------------------------
+			ps = con.prepareStatement("insert into accounts(primaryUserId, status, balance) values(?, ?, ?)");
+			ps.setInt(1, customer.getId());
+			ps.setString(2, "pending");
+			ps.setFloat(3, 0);
 			ps.executeUpdate();
 			
 		} catch (SQLException e) {
-			e.printStackTrace();
 			System.out.println("Error: Failed to create new user");
+			e.printStackTrace();
 			return;	
 		}
 	}
 	
-	@Override
 	public boolean checkIfAccountExists(String username) {
 		Connection con = ConnectionUtil.getInstance().getConnection();
 		ResultSet results;
 		try {
-			PreparedStatement ps = con.prepareStatement("Select * from account where username = ?");
+			PreparedStatement ps = con.prepareStatement("Select * from users where username = ?");
 			ps.setString(1, username);
 			results = ps.executeQuery();
 			if(results.next())			//if the result exists, we know that the account exists
@@ -67,7 +72,21 @@ public class CustomerDao implements Dao<Customer> {
 	}
 
 	@Override
-	public List getAll() {
+	public List getAll() {				//TODO gets all customers
+		Connection con = ConnectionUtil.getInstance().getConnection();
+		ResultSet results;
+		ArrayList<Customer> customers = new ArrayList<>();
+		Customer customer;
+		try {
+			PreparedStatement ps = con.prepareStatement("select * from users where users.id =  ");
+			results = ps.executeQuery();
+			while(results.next()) {
+			//TODO query here	
+			}
+		} catch (SQLException e) {
+			System.out.println("SQL Error: Couldn't get all");
+			e.printStackTrace();
+		}
 		return null;
 	}
 	
@@ -89,25 +108,20 @@ public class CustomerDao implements Dao<Customer> {
 		
 	}
 	
-//	public boolean checkIfExists() {
-//		
-//	}
 
 	public int authenticateAndGetId(String username, String password) {//return positive integer for successful id
 		Connection con = ConnectionUtil.getInstance().getConnection();
 		ResultSet results;
 		int id=-1;
 		try{
-			PreparedStatement ps = con.prepareStatement("select id, username, password from account");
+			PreparedStatement ps = con.prepareStatement("select id, username, password from users");
 			results = ps.executeQuery();
-			while(results.next()) {
-				if(username.equals(results.getString("username"))) {
-					if(password.equals(results.getString("password"))){
-						id = results.getInt("id");
-						return id;
-					}
-				}
+			results.next();
+			if(username.equals(results.getString("username")) && password.contentEquals(results.getString("password"))) {
+				id = results.getInt("id");
+				return id;
 			}
+			
 			
 		}catch(SQLException e) {
 			System.out.println("Error: SQL Exception");
@@ -116,34 +130,44 @@ public class CustomerDao implements Dao<Customer> {
 		return id;
 	}
 	
-	public Customer getCustomer(int id) {
+	public Customer getCustomerById(int id) {
+		Customer customer = new Customer();
 		Connection con = ConnectionUtil.getInstance().getConnection();
 		ResultSet results;
-		Customer customer = null;
+		
 		try {
-			//get customer info from account
-			PreparedStatement ps = con.prepareStatement("select id, fname, lname, username from account where id = ?");
+			//----------------------populate user info----------------------------------------
+			PreparedStatement ps = con.prepareStatement("select * from users where id = ?");
 			ps.setInt(1, id);
 			results = ps.executeQuery();
 			results.next();
-			customer = new Customer();
+			customer.setUsername(results.getString("username"));
+			customer.setFirstName(results.getString("firstName"));
+			customer.setLastName(results.getString("lastName"));
 			customer.setId(results.getInt("id"));
-			customer.setFirstName(results.getString("fname"));
-			customer.setLastName(results.getString("lname"));
-			customer.setUsername("username");
+			customer.setPassword(results.getString("password"));
+			customer.setPermission(results.getString("permission"));
 			
-			//get customer info from customer
-			ps = con.prepareStatement("select balance from customer where id = ?");
+			//-----------------------populate user account info-------------------------------
+			ps = con.prepareStatement("select * from accounts where primaryUserId = ?");
 			ps.setInt(1, id);
 			results = ps.executeQuery();
 			results.next();
-			customer.setBalance(results.getDouble("balance"));
+			customer.getAccount().setBalance(results.getFloat("balance"));
+			customer.getAccount().setPrimaryUserId(results.getInt("id"));
+			customer.getAccount().setStatus(results.getString("status"));
+			
+			return customer;
 			
 			
-		}catch(SQLException e){
-			System.out.println("Error: SQL Exception");
+		} catch (SQLException e) {
+			System.out.println("SQL Exception");
+			e.printStackTrace();
+			return null;
 		}
-		return customer;
+		
 	}
+	
+	
 
 }

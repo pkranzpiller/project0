@@ -1,11 +1,14 @@
 package customer;
 
-import shared.Account;
+import shared.User;
 
-public class Customer extends Account {
-	private double balance;
+public class Customer extends User {
+	private Account account;
 	
-	public Customer(){}
+	public Customer(){
+		this.account = new Account();
+		account.setBalance(0);
+	}
 
 	public Customer(int id, String username, String password, String fname, String lname, double balance) { //used for creating new customer
 		super();
@@ -13,16 +16,14 @@ public class Customer extends Account {
 		this.firstName = fname;
 		this.lastName = lname;
 		this.password = password;
-		this.balance = 0;
+		this.account = new Account();
+		account.setBalance(0);
+	}
+	
+	public Account getAccount() {
+		return account;
 	}
 
-	public void setBalance(double balance) {
-		this.balance = balance;
-	}
-
-	public double getBalance() {
-		return balance;
-	}
 	
 //	public Customer login(String username, String password) {
 //		

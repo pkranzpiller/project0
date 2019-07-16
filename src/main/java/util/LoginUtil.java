@@ -4,10 +4,8 @@ import java.util.Scanner;
 
 import customer.Customer;
 import customer.CustomerDao;
-import shared.Login;
 
 public class LoginUtil {
-	private Login login;
 	
 	
 	public LoginUtil(){
@@ -16,94 +14,112 @@ public class LoginUtil {
 	
 	public Customer loginHandler(String input) {	//return null if customer doesn't exist
 		
-		Scanner s = new Scanner(System.in);
-		boolean validUser = false;
 		Customer customer = null;//will carry customer data which we'll use after this submenu
 		
 		while(customer == null) {
 			switch(input) {
 			case "l":    //--------------------logging in-----------------------
-				customer = login(customer);
-				if(customer != null)
+				customer = login();
+				if(customer != null){
 					return customer;
+				}
 				else
-					break;
+					return null;
 			case "n":	//--------------------creating new account--------------
-				customer = CreateNewCustomer();
-				if(customer != null)
+				customer = createNewCustomer();
+				if(customer != null) {
+					System.out.println("account created and set for pending");
 					return customer;
-				else
-					break;
+				}else
+					return null;
 			default:
 				System.out.println("Error pulling up correct menu");
+				return null;
 			}
 		}
 		return null;
 	}
 	
-	private Customer login(Customer customer) {//method to log the user in
+	private Customer login() {//method to log the user in
 		int id;
-		String [] user = {};
-		while(user.length != 2) {
-			System.out.println("Please enter your username and password (<username> <password>):");
-			Scanner login = new Scanner(System.in);
-			user = login.nextLine().split(" ");
-		}
+		Customer customer;
+		String username;
+		String password;
+		Scanner s = new Scanner(System.in);
+		
+		System.out.println("Please enter your username: ");
+		username = s.next();
+		s.nextLine();
+		System.out.println("Please enter your password: ");
+		password = s.next();
+		s.nextLine();
+		
+		
 		
 		CustomerDao customerData = new CustomerDao();
-		id = customerData.authenticateAndGetId(user[0], user[1]);
+		id = customerData.authenticateAndGetId(username, password);
 		if(id > 0) {	//id return -1 when it can't retrieve information successfully
-			customer = customerData.getCustomer(id);
 //			System.out.println(customer.getUsername() + " " + customer.getFirstName() + " " + customer.getLastName());
+			customer = customerData.getCustomerById(id);
 			return customer;
 		}else {
-			System.out.println("Invalid login, please try again or restart to create an account");
+			System.out.println("Invalid login, please try again");
 			return null;
 		}
 	}
 	
-	private Customer CreateNewCustomer() {
-		String [] input = {};
+	
+	
+	
+	private Customer createNewCustomer() {
+		String input;
 		Customer customer = new Customer();
-		Scanner s = new Scanner(System.in);
-		while(input.length != 2) {
-			System.out.println("Please enter a username and password, separated by a space (<username> <password>)");
-			input = s.nextLine().split(" ");
-		}
-		
-		
-		
 		CustomerDao customerData = new CustomerDao();
-		customer.setUsername(input[0]);
-		customer.setPassword(input[1]);
+
+		Scanner s = new Scanner(System.in);
+		
+		//---------------------------------------get user information--------------------------------------------------
+		System.out.println("Please enter a username. Any spaces will be truncated");
+		input = s.next();
+		s.nextLine();
+		customer.setUsername(input);
+		System.out.println("Username is: " + customer.getUsername());
 		
 		
-		if(customerData.checkIfAccountExists(customer.getUsername()) == false) {		//Check if username already exists. Return null on existing customer
-			System.out.println("Account already exists. Please select a different username");
+		if(!customerData.checkIfAccountExists(customer.getUsername())){
+			System.out.println("Account already exists, please try again");
 			return null;
 		}
 		
-		String [] input2 = {};
+		System.out.println("Enter a password. Any spaces will be truncated");
+		input = s.next();
+		s.nextLine();
+		customer.setPassword(input);
+		System.out.println("Password is: " + customer.getPassword() );
 		
-		s = new Scanner(System.in);
+		System.out.println("Enter your first name. Any spaces will be truncated");
+		input = s.next();
+		s.nextLine();
+		customer.setFirstName(input);
+		System.out.println("First name is: " + customer.getFirstName());
 		
-		while(input2.length != 2) {
-			System.out.println("Please enter your first name and last name, separated by a space(<first name> <last name>)");
-			input2 = s.nextLine().split(" ");
-		}
+		System.out.println("Enter your last name. Any spaces will be truncated");
+		input = s.next();
+		s.nextLine();
+		customer.setLastName(input);
+		System.out.println("Last name is: " + customer.getLastName());
 		
-		customer.setFirstName(input2[0]);
-		customer.setLastName(input2[1]);
+		customer.setPermission("customer");
+		
+		//-------------------------------------------------insert user information to database------------------------------------------
+		
 		
 		customerData.insert(customer);
+		System.out.println("Customer info entered is: " + " " + customer.getId() + " " + customer.getUsername() + " "
+		+ customer.getPassword() + " " + customer.getFirstName() + " " + 
+				customer.getLastName() + " " + customer.getPermission());
 		
-		s.close();
 		return customer;
-		
-		
-		
-		
-		
 	}
 	
 }
