@@ -1,5 +1,6 @@
 package com.revature;
 
+import admin.AdminMainMenu;
 import customer.CustomerMainMenu;
 import employee.EmployeeMainMenu;
 
@@ -22,6 +23,7 @@ public class MainInputHandler {
 			return;
 		case "admin":
 			System.out.println("Starting administrator application");
+			AdminMainMenu.start();
 			return;
 		default:
 			System.out.println("Invalid input. Please pass customer, employee, or admin to start the correct application");

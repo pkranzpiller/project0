@@ -74,7 +74,7 @@ public class LoginUtil {
 	
 	
 	
-	private Customer createNewCustomer() {
+	public Customer createNewCustomer() {
 		String input;
 		Customer customer = new Customer();
 		CustomerDao customerData = new CustomerDao();

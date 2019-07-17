@@ -20,7 +20,7 @@ public class CustomerMainMenu {
 		
 		while(!shutdown) {
 			Scanner s = new Scanner(System.in);
-			System.out.println("Log in or create new account?(l, n) ");
+			System.out.println("Log in, create new account, or shut down?(l, n, s) ");
 			input = s.next();
 			
 			if(input.equalsIgnoreCase("l")) {
@@ -29,7 +29,7 @@ public class CustomerMainMenu {
 					CustomerSubMenu.startSubMenu(customer);		//only start customer submenu if customer is not null
 			}else if (input.equalsIgnoreCase("n")) {
 				customer = new LoginUtil().customerLoginHandler(input);
-			}else if(input.equalsIgnoreCase("shutdown")){
+			}else if(input.equalsIgnoreCase("s")){
 				shutdown = true;
 				System.out.println("shutting down");
 			}

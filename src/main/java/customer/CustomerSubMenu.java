@@ -9,6 +9,11 @@ public class CustomerSubMenu {
 	public static void startSubMenu(Customer customer) {
 		String input = "";
 		Scanner s = new Scanner(System.in);
+		
+		if(!customer.getPermission().equals("customer")) {
+			System.out.println("This terminal is intended for customers, please use the correct application");
+			return;
+		}
 
 		if(customer.getAccount().getStatus().equalsIgnoreCase("pending")) {
 			System.out.println("Account is still pending. Please try again later");

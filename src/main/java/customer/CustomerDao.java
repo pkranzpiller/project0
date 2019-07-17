@@ -277,6 +277,9 @@ public class CustomerDao implements Dao<Customer> {
 			customer.setPassword(results.getString("password"));
 			customer.setPermission(results.getString("permission"));
 			
+			if(!customer.getPermission().equals("customer"))		//return early without account
+				return customer;
+			
 			//-----------------------populate user account info-------------------------------
 			ps = con.prepareStatement("select * from accounts where primaryUserId = ?");
 			ps.setInt(1, id);

@@ -1,4 +1,4 @@
-package employee;
+package admin;
 
 import java.util.Scanner;
 
@@ -6,33 +6,36 @@ import customer.Customer;
 import customer.CustomerDao;
 import util.LoginUtil;
 
-public class EmployeeSubMenu {
+public class AdminSubMenu {
 	
-	public static void start(Employee e) {
-		
+	public static void start(Admin admin) {
 		while(true) {
 			System.out.println("What would you like to do?");
 			System.out.println("1: View customer account information by username");
 			System.out.println("2: Approve, open or close customer accounts");
-			//TODO deposit or withdraw money for the customer
-			System.out.println("3: Create new customer account");
-			System.out.println("4: Exit");
+			System.out.println("3: Edit account");
+			System.out.println("4: Create new customer account");
+			System.out.println("5: Exit");
 			
 			Scanner s = new Scanner(System.in);
 			try {
 				String input = s.next();
 				switch(input) {
 				case "1":
-					viewCustomerInfo();
+					viewAccountInfo();
 					break;
 				case "2":
 					changeAccountStatus();
 					break;
 				case "3":
-					LoginUtil loginUtil = new LoginUtil();
-					loginUtil.createNewCustomer();
+					editAccount();
 					break;
 				case "4":
+					LoginUtil loginUtil = new LoginUtil();
+					loginUtil.createNewCustomer();
+					System.out.println("");
+					break;
+				case "5":
 					return;
 				default:
 					System.out.println("Invalid entry, try again");
@@ -42,8 +45,18 @@ public class EmployeeSubMenu {
 				System.out.println("Invalid entry");
 			}
 		}
+		
 	}
 	
+	private static void editAccount() {
+		System.out.println("Please enter your SQL statement");
+		Scanner s = new Scanner(System.in);
+		String input = s.nextLine();
+		
+		AdminDao adminDao = new AdminDao();
+		adminDao.executeRawStatement(input);
+		
+	}
 	
 	private static void changeAccountStatus() {
 		System.out.println("What is the customers username");
@@ -61,6 +74,10 @@ public class EmployeeSubMenu {
 		Customer customer = customerData.getCustomerByUsername(username);
 		if(customer == null) {
 			System.out.println("Customer doesn't exist");
+			return;
+		}
+		if(!customer.getPermission().equals("customer")) {
+			System.out.println("User is not a customer. Edit account to make necessary changes");
 			return;
 		}
 		
@@ -92,13 +109,10 @@ public class EmployeeSubMenu {
 			System.out.println("Invalid selection");
 			return;
 		}
-		
-		
-		
 	}
 	
-	private static void viewCustomerInfo() {
-		System.out.println("What is the customers username");
+	private static void viewAccountInfo() {
+		System.out.println("What is the username you're trying to look up");
 		Scanner s = new Scanner(System.in);
 		String username = null;
 		try {
@@ -109,21 +123,23 @@ public class EmployeeSubMenu {
 		}
 		
 		//get customer info
-		CustomerDao customerData = new CustomerDao();
-		Customer customer = customerData.getCustomerByUsername(username);
-		if(customer == null) {
+		AdminDao adminData = new AdminDao();
+		Admin user = adminData.getAdminByUsername(username);
+		if(user == null) {
 			System.out.println("Customer doesn't exist");
 			return;
 		}
 		
 		System.out.println("Customer info");
-		System.out.println("User ID: " + customer.getId());
-		System.out.println("Username: " + customer.getUsername());
-		System.out.println("First Name: " + customer.getFirstName());
-		System.out.println("Last Name: " + customer.getLastName());
-		System.out.println("Balance: " + customer.getAccount().getBalance());
-		System.out.println("Account Status: " + customer.getAccount().getStatus());
+		System.out.println("User ID: " + user.getId());
+		System.out.println("Username: " + user.getUsername());
+		System.out.println("First Name: " + user.getFirstName());
+		System.out.println("Last Name: " + user.getLastName());
+		System.out.println("Permission Level: " + user.getPermission());
+		System.out.println("Balance: " + user.getAccount().getBalance());
 		System.out.println();
 	}
+	
+	
 
 }
