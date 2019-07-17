@@ -195,7 +195,10 @@ public class CustomerDao implements Dao<Customer> {
 			PreparedStatement ps = con.prepareStatement("select id, username, password from users where users.username = ?");
 			ps.setString(1, username);
 			results = ps.executeQuery();
-			results.next();
+			if(!results.next()) {
+				System.out.println("Couldn't authenticate");
+				return id;
+			}
 			if(username.equals(results.getString("username")) && password.equals(results.getString("password"))) {
 				id = results.getInt("id");
 				return id;
