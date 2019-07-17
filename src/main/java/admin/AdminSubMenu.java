@@ -49,12 +49,13 @@ public class AdminSubMenu {
 	}
 	
 	private static void editAccount() {
-		System.out.println("Please enter your SQL statement");
-		Scanner s = new Scanner(System.in);
-		String input = s.nextLine();
-		
-		AdminDao adminDao = new AdminDao();
-		adminDao.executeRawStatement(input);
+//		System.out.println("Please enter your SQL statement");
+//		Scanner s = new Scanner(System.in);
+//		String input = s.nextLine();
+//		
+//		AdminDao adminDao = new AdminDao();
+//		adminDao.executeRawStatement(input);
+		System.out.println("still needs implementing");
 		
 	}
 	
