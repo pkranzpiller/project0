@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 import customer.Customer;
 import customer.CustomerDao;
+import employee.Employee;
 
 public class LoginUtil {
 	
@@ -12,14 +13,16 @@ public class LoginUtil {
 		
 	}
 	
-	public Customer loginHandler(String input) {	//return null if customer doesn't exist
+	
+	
+	public Customer customerLoginHandler(String input) {	//return null if customer doesn't exist
 		
 		Customer customer = null;//will carry customer data which we'll use after this submenu
 		
 		while(customer == null) {
 			switch(input) {
 			case "l":    //--------------------logging in-----------------------
-				customer = login();
+				customer = customerLogin();
 				if(customer != null){
 					return customer;
 				}
@@ -40,7 +43,7 @@ public class LoginUtil {
 		return null;
 	}
 	
-	private Customer login() {//method to log the user in
+	private Customer customerLogin() {//method to log the user in
 		int id;
 		Customer customer;
 		String username;

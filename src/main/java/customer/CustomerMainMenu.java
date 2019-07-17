@@ -24,11 +24,11 @@ public class CustomerMainMenu {
 			input = s.next();
 			
 			if(input.equalsIgnoreCase("l")) {
-				customer = new LoginUtil().loginHandler(input);
+				customer = new LoginUtil().customerLoginHandler(input);
 				if(customer != null)
 					CustomerSubMenu.startSubMenu(customer);		//only start customer submenu if customer is not null
 			}else if (input.equalsIgnoreCase("n")) {
-				customer = new LoginUtil().loginHandler(input);
+				customer = new LoginUtil().customerLoginHandler(input);
 			}else if(input.equalsIgnoreCase("shutdown")){
 				shutdown = true;
 				System.out.println("shutting down");

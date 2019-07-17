@@ -12,6 +12,22 @@ import util.ConnectionUtil;
 
 public class CustomerDao implements Dao<Customer> {
 	
+	public void setAccountStatus(Customer customer, String status) {
+		Connection con = ConnectionUtil.getInstance().getConnection();
+		
+		try {
+			PreparedStatement ps = con.prepareStatement("update accounts set status = ? where accounts.primaryUserId = ?");
+			ps.setString(1, status);
+			ps.setInt(2, customer.getId());
+			ps.executeUpdate();
+			customer.getAccount().setStatus(status);
+		} catch (SQLException e) {
+			System.out.println("Unable to update account permissions");
+			e.printStackTrace();
+		}
+		
+	}
+	
 	public void transferFunds(Customer source,Customer destination, Float amount) {
 		float newSourceBalance = source.getAccount().getBalance() - amount;
 		float newDestinationBalance = destination.getAccount().getBalance() + amount;
@@ -204,7 +220,16 @@ public class CustomerDao implements Dao<Customer> {
 			PreparedStatement ps = con.prepareStatement("select * from users where username = ?");
 			ps.setString(1, username);
 			results = ps.executeQuery();
-			results.next();
+			if(!results.next()) {
+				System.out.println("Couldn't find user");
+				return null;
+			}
+			
+			if(!results.getString("permission").equals("customer")) {
+				System.out.println("Account type is not of customer");
+				return null;
+			}
+			
 			customer.setUsername(results.getString("username"));
 			customer.setFirstName(results.getString("firstName"));
 			customer.setLastName(results.getString("lastName"));
@@ -212,6 +237,8 @@ public class CustomerDao implements Dao<Customer> {
 			customer.setId(id);
 			customer.setPassword(results.getString("password"));
 			customer.setPermission(results.getString("permission"));
+			
+			
 			
 			//-----------------------populate user account info-------------------------------
 			ps = con.prepareStatement("select * from accounts where primaryUserId = ?");

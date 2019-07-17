@@ -1,6 +1,7 @@
 package com.revature;
 
 import customer.CustomerMainMenu;
+import employee.EmployeeMainMenu;
 
 public class MainInputHandler {
 	private String input;
@@ -17,6 +18,7 @@ public class MainInputHandler {
 			return;
 		case "employee":
 			System.out.println("Starting employee application");
+			EmployeeMainMenu.start();
 			return;
 		case "admin":
 			System.out.println("Starting administrator application");
