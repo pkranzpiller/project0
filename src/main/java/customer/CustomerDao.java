@@ -11,6 +11,67 @@ import shared.Dao;
 import util.ConnectionUtil;
 
 public class CustomerDao implements Dao<Customer> {
+	
+	public void transferFunds(Customer source,Customer destination, Float amount) {
+		float newSourceBalance = source.getAccount().getBalance() - amount;
+		float newDestinationBalance = destination.getAccount().getBalance() + amount;
+		
+		Connection con = ConnectionUtil.getInstance().getConnection();
+		try {
+			//-----------------update source balance----------------------------
+			PreparedStatement ps = con.prepareStatement("update accounts set balance = ? where accounts.primaryUserId = ?");
+			ps.setFloat(1, newSourceBalance);
+			ps.setInt(2, source.getId());
+			ps.executeUpdate();
+			
+			
+			//-----------------update destination balance----------------------
+			ps = con.prepareStatement("update accounts set balance = ? where accounts.primaryUserId = ?");
+			ps.setFloat(1, newDestinationBalance);
+			ps.setInt(2, destination.getId());
+			ps.executeUpdate();
+			
+			//----------------update source and destination account balances------
+			source.getAccount().setBalance(newSourceBalance);
+			destination.getAccount().setBalance(newDestinationBalance);
+		} catch (SQLException e) {
+			System.out.println("Couldn't get destination balance to transfer funds");
+			e.printStackTrace();
+		}
+	}
+	
+	public void deposit(Customer customer, Float amount) {
+		float newBalance = customer.getAccount().getBalance() + amount;
+		Connection con = ConnectionUtil.getInstance().getConnection();
+		try {
+			PreparedStatement ps = con.prepareStatement("update accounts set balance = ? where accounts.primaryUserId = ?");
+			ps.setFloat(1, newBalance);
+			ps.setInt(2, customer.getId());
+			ps.executeUpdate();
+			customer.getAccount().setBalance(newBalance);
+		} catch (SQLException e) {
+			System.out.println("Couldn't deposit amount in database. It's our money now! >:)");
+			e.printStackTrace();
+		}
+	}
+	
+	
+	public void withdraw(Customer customer, Float amount) {
+		float newBalance = customer.getAccount().getBalance() - amount;
+		Connection con = ConnectionUtil.getInstance().getConnection();
+		try {
+			PreparedStatement ps = con.prepareStatement("update accounts set balance = ? where accounts.primaryUserId = ?");
+			ps.setFloat(1, newBalance);
+			ps.setInt(2, customer.getId());
+			ps.executeUpdate();
+			customer.getAccount().setBalance(newBalance);
+		} catch (SQLException e) {
+			System.out.println("Couldn't update withdrawal amount in database");
+			e.printStackTrace();
+		}
+	}
+	
+	
 
 	@Override
 	public void insert(Customer customer) {			//use checkIfAccountExists before calling this method and make sure to have
@@ -53,17 +114,18 @@ public class CustomerDao implements Dao<Customer> {
 		}
 	}
 	
-	public boolean checkIfAccountExists(String username) {
+	public boolean checkIfAccountExists(String username) {		//returns true if the account exists
 		Connection con = ConnectionUtil.getInstance().getConnection();
 		ResultSet results;
 		try {
 			PreparedStatement ps = con.prepareStatement("Select * from users where username = ?");
 			ps.setString(1, username);
 			results = ps.executeQuery();
-			if(results.next())			//if the result exists, we know that the account exists
-				return false;
-			else
-				return true; 			//if the result doesn't exist, then we're good
+			if(results.next())
+				if(results.getString("username").equals(username))
+					return true;
+			
+			return false;
 		} catch (SQLException e) {
 			System.out.println("Error: SQL exception. Failed to check if account exists");
 			e.printStackTrace();
@@ -114,10 +176,11 @@ public class CustomerDao implements Dao<Customer> {
 		ResultSet results;
 		int id=-1;
 		try{
-			PreparedStatement ps = con.prepareStatement("select id, username, password from users");
+			PreparedStatement ps = con.prepareStatement("select id, username, password from users where users.username = ?");
+			ps.setString(1, username);
 			results = ps.executeQuery();
 			results.next();
-			if(username.equals(results.getString("username")) && password.contentEquals(results.getString("password"))) {
+			if(username.equals(results.getString("username")) && password.equals(results.getString("password"))) {
 				id = results.getInt("id");
 				return id;
 			}
@@ -128,6 +191,45 @@ public class CustomerDao implements Dao<Customer> {
 			e.printStackTrace();
 		}
 		return id;
+	}
+	
+	public Customer getCustomerByUsername(String username) {
+		Connection con = ConnectionUtil.getInstance().getConnection();
+		ResultSet results;
+		
+		Customer customer = new Customer();
+		
+		try{
+			//----------------------populate user info----------------------------------------
+			PreparedStatement ps = con.prepareStatement("select * from users where username = ?");
+			ps.setString(1, username);
+			results = ps.executeQuery();
+			results.next();
+			customer.setUsername(results.getString("username"));
+			customer.setFirstName(results.getString("firstName"));
+			customer.setLastName(results.getString("lastName"));
+			int id = results.getInt("id");
+			customer.setId(id);
+			customer.setPassword(results.getString("password"));
+			customer.setPermission(results.getString("permission"));
+			
+			//-----------------------populate user account info-------------------------------
+			ps = con.prepareStatement("select * from accounts where primaryUserId = ?");
+			ps.setInt(1, id);
+			results = ps.executeQuery();
+			results.next();
+			customer.getAccount().setBalance(results.getFloat("balance"));
+			customer.getAccount().setPrimaryUserId(results.getInt("id"));
+			customer.getAccount().setStatus(results.getString("status"));
+			
+			return customer;
+			
+			
+		}catch(SQLException e) {
+			System.out.println("Error: Couldn't get user by username");
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	public Customer getCustomerById(int id) {

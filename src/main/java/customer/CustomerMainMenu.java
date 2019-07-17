@@ -25,6 +25,8 @@ public class CustomerMainMenu {
 			
 			if(input.equalsIgnoreCase("l")) {
 				customer = new LoginUtil().loginHandler(input);
+				if(customer != null)
+					CustomerSubMenu.startSubMenu(customer);		//only start customer submenu if customer is not null
 			}else if (input.equalsIgnoreCase("n")) {
 				customer = new LoginUtil().loginHandler(input);
 			}else if(input.equalsIgnoreCase("shutdown")){

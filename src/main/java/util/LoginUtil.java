@@ -86,7 +86,7 @@ public class LoginUtil {
 		System.out.println("Username is: " + customer.getUsername());
 		
 		
-		if(!customerData.checkIfAccountExists(customer.getUsername())){
+		if(customerData.checkIfAccountExists(customer.getUsername())){
 			System.out.println("Account already exists, please try again");
 			return null;
 		}
